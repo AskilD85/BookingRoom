@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Room } from '../model/Room';
 
@@ -6,11 +6,21 @@ import { Room } from '../model/Room';
   providedIn: 'root'
 })
 export class HttpService {
-  uri = 'http://localhost:5000/api'
+  private uri = 'http://localhost:5000/api'
 
   constructor(private http: HttpClient) { }
 
   getRooms() {
     return this.http.get(`${this.uri}/rooms`);
+  }
+
+  bookedRoom(data:Room[] | any) {
+    const headers = new HttpHeaders({});
+    const formData: FormData = new FormData();
+    const dataString = JSON.stringify(data);
+
+    formData.append('data', dataString.toString());
+    // return this.http.post(this.url + `articles/${id}`, formData, { headers });
+    return this.http.post(`${this.uri}/rooms`, formData, { headers } );
   }
 }

@@ -2,11 +2,16 @@ const cors = require('cors');
 const fs = require('fs')
 const bodyParser = require('body-parser');
 const express = require('express');
+const formData = require("express-form-data");
 
 // Create express app
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// parse data with connect-multiparty.
+app.use(formData.parse());
+
 
 
 //получение списка комнат
@@ -33,16 +38,31 @@ res.status(200).send( JSON.stringify(data) );
 });
 
 
-app.put('/api/new', (req, res) => {
+app.post('/api/rooms',   (req, res) => {
+
+
     if (req.body) {
-        let body = req.body;
-        DATABASE.USERS.push({ name: body.name, email: body.email, password: body.password });
-        res.status(200).send({ message: 'User has been successfully created.' });
+        var data1 = JSON.parse(req.body.data.toString());
+    fs.writeFile("./rooms.json", JSON.stringify(data1), (err, result) => {  // WRITE
+        if (err) {
+          const status = 401
+          const message = err
+          res.status(status).json({status, message})
+          return
+        }
+    });
+
+    res.status(200).send( { message: "Good!"}  );
+
     } else {
         res.status(500).send({
             errorMessage: 'Incorrect data'
         });
     }
+
+    res.status(200).send({ message: 'Пизда'});
+
 });
+
 
 app.listen(5000, () => console.log('Server started on port 5000'));
