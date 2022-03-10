@@ -2,7 +2,7 @@
 <h1 mat-dialog-title>Комната номер: {{room.roomNum}} </h1>
 <div mat-dialog-content>
   <p>Мест в комнате {{room.places}}</p>
-  <p>Доступно для заселения с {{room.bookPeriod.start}} по {{room.bookPeriod.end}}</p>
+  <p>Доступно для заселения с <b>{{room.bookPeriod.start | date: 'mediumDate':'+0500' }}</b> по <b>{{room.bookPeriod.end | date: 'mediumDate':'+0500'}}</b></p>
 
   <mat-form-field appearance="fill">
   <mat-label>Выберите диапазон даты</mat-label>
