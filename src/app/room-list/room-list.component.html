@@ -1,4 +1,4 @@
-<div  class="container">
+<div  class="container" >
 
 
 <mat-form-field appearance="fill">
@@ -19,7 +19,7 @@
 
   <div class="mat-elevation-z8">
     <button *ngIf="dataSource?.filteredData !== undefined ? (dataSource.filteredData.length != 0 && dataSource.filteredData.length < dataSource.data.length) : false"  mat-button (click)="showAll()">Сбросить фильтр</button>
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="dataSource" matSort *ngIf="serverIsOk === true; else noContent">
 
       <!-- NUM Column -->
       <ng-container matColumnDef="num">
@@ -41,7 +41,7 @@
 
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row  [ngClass]="{booked:row.bookDates !== undefined  }" *matRowDef="let row; columns: displayedColumns;" (click) = "bookRoom(row)"></tr>
+      <tr  mat-row  [ngClass]="{booked:row.bookDates !== undefined  }" *matRowDef="let row; columns: displayedColumns;" (click) = "bookRoom(row)"></tr>
 
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
@@ -54,3 +54,4 @@
   </div>
 </div>
 
+<ng-template #noContent><div style = "background-color: red; text-align: center; font-weight: bold; color:white;">нет подключения к серверу</div></ng-template>

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { BookDates, BookRoomData } from '../model/BookRoomData';
+import { BookDates } from '../model/BookRoomData';
 import { BookPeriod, Room } from '../model/Room';
 import { RoomBookComponent } from '../room-book/room-book.component';
 import { HttpService } from './../services/http.service';
@@ -23,8 +23,9 @@ import { HttpService } from './../services/http.service';
 export class RoomListComponent implements OnInit, AfterViewInit {
   filterDictionary = new Map<string, string>();
   rooms!: Room[];
+  serverIsOk!: boolean;
   displayedColumns: string[] = ['num', 'places', 'price'];
-  dataSource!: MatTableDataSource<Room>;
+  dataSource: MatTableDataSource<Room> = new MatTableDataSource(this.rooms);
 
   range = new FormGroup({
     start: new FormControl(),
@@ -73,18 +74,21 @@ export class RoomListComponent implements OnInit, AfterViewInit {
  }
   ngOnInit() {
     this.getRooms()
-
-
   }
 
   getRooms() {
     this.range.reset()
     this.httpService.getRooms().subscribe(
       (data:any)=> {
+        this.serverIsOk = true;
         this.rooms = data;
         this.dataSource = new MatTableDataSource(this.rooms);
         this.dataSource.paginator = this.paginator || null;
         this.dataSource.sort = this.sort;
+      }, (err) => {
+        console.log(err);
+        this.rooms = []
+        this.serverIsOk = false;
       }
     );
   }
