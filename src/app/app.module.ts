@@ -14,12 +14,14 @@ import { MaterialExampleModule } from './material.module';
 import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { RoomBookComponent } from './room-book/room-book.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RoomListComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
+    RoomBookComponent
   ],
   imports: [
    BrowserAnimationsModule,
