@@ -4,7 +4,8 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Room } from '../model/Room';
+import { BookPeriod, Room } from '../model/Room';
+import { HttpService } from './../services/http.service';
 
 
 
@@ -17,8 +18,12 @@ import { Room } from '../model/Room';
 
 
 export class RoomListComponent implements OnInit, AfterViewInit {
+
+  filterDictionary = new Map<string, string>();
+  rooms = [];
+
   displayedColumns: string[] = ['num', 'places', 'price'];
-  dataSource: MatTableDataSource<Room>;
+  dataSource!: MatTableDataSource<Room>;
 
   range = new FormGroup({
     start: new FormControl(),
@@ -27,10 +32,9 @@ export class RoomListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   @ViewChild(MatSort) sort!: MatSort ;
-  constructor() {
-    // Create 100 users
+  constructor(private httpService: HttpService) {
+    // Create 40 rooms
     const rooms = Array.from({ length: 40 }, (_, k) => createNewRooms(k + 1));
-
     // Assign the data to the data source for the table to render
     this.dataSource = new MatTableDataSource(rooms);
   }
@@ -38,54 +42,73 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator || null;
     this.dataSource.sort = this.sort;
-
  }
 
 
 
   ngOnInit(): void {
-    console.log(this.dataSource.data);
+//--------------------------
+    // this.getRooms()
+
+      this.dataSource.filterPredicate = (data, filter) => {
+        var map = new Map(JSON.parse(filter));
+        let startDate = false;
+        let endDate = false;
+        let isMatch = false
+
+         for (let [key, value] of map) {
+           if (key === 'start') {
+             let date1 = new Date((data.bookPeriod[key as keyof BookPeriod]).toDateString())
+             let dd = new Date(String(value))
+             startDate = date1 >= dd;
+          }
+
+           if (key === 'end') {
+             let date1 = new Date((data.bookPeriod[key as keyof BookPeriod]).toDateString())
+             let dd = new Date(String(value))
+             endDate = date1 <= dd;
+           }
+
+           if ((startDate === true && endDate === true) || value === 'All') {
+             isMatch = true;
+           }
+         }
+
+         return isMatch;
+      }
+
 
   }
 
-  applyFilter(event: Event) {
-    console.log('applyFilter');
-
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  getRooms() {
+    this.httpService.getRooms().subscribe(
+      (data:any)=> {
+        this.rooms = data;
+        this.dataSource = new MatTableDataSource(data);
+        this.dataSource.paginator = this.paginator || null;
+        this.dataSource.sort = this.sort;
+      }
+    )
   }
+
+
 
   applyDateFilter(event: MatDatepickerInputEvent<Date>) {
-
-    console.log(event.target.value);
-
-
     const startDate = this.range.value.start;
-    let endDate = this.range.value.end;
+    const endDate = this.range.value.end;
 
-    console.log(startDate);
-
-    let data = []
-
-    data = this.dataSource.data;
-
-    console.log(1,  data);
-
-    data = data.filter((item) => item.bookPeriod.end <= endDate && item.bookPeriod.start >= startDate )
-
-    console.log(2, data);
-
-    this.dataSource.data = data;
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.filterDictionary.set('start', startDate !== (null || undefined) ? startDate : 'All');
+    this.filterDictionary.set('end', endDate !== (null || undefined) ? endDate : 'All');
+    var jsonString = JSON.stringify(Array.from(this.filterDictionary.entries()));
+    this.dataSource.filter = jsonString;
   }
 
+  showAll() {
+    this.filterDictionary.set('start', 'All');
+    var jsonString = JSON.stringify(Array.from(this.filterDictionary.entries()));
+    this.dataSource.filter = jsonString;
+    this.range.reset()
+  }
 }
 
 /** Builds and returns a new User. */

@@ -1,15 +1,5 @@
 [
     {
-        "roomNum": 1,
-        "id": 1,
-        "places": 2,
-        "price": 2400,
-        "bookPeriod": {
-            "start": "Mon Mar 7 2022 18:50:45 GMT+0500 (GMT+05:00)",
-            "end": "Mon Mar 14 2022 18:50:45 GMT+0500 (GMT+05:00)"
-        }
-    },
-    {
         "roomNum": 2,
         "id": 2,
         "places": 4,
