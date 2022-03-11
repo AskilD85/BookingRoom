@@ -5,9 +5,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { Store } from '@ngrx/store';
 import { BookDates } from '../model/BookRoomData';
 import { BookPeriod, Room } from '../model/Room';
 import { RoomBookComponent } from '../room-book/room-book.component';
+import { BookRoom, init, bookRoom, cancelBookRoom } from '../store/actions/rooms.action';
 import { HttpService } from './../services/http.service';
 
 
@@ -35,7 +37,8 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   @ViewChild(MatSort) sort!: MatSort ;
   constructor(private httpService: HttpService,
-              public dialog: MatDialog) {
+              public dialog: MatDialog,
+              private store: Store) {
     // Create 40 rooms
     // const rooms = Array.from({ length: 40 }, (_, k) => createNewRooms(k + 1));
     // Assign the data to the data source for the table to render
@@ -74,6 +77,7 @@ export class RoomListComponent implements OnInit, AfterViewInit {
  }
   ngOnInit() {
     this.getRooms()
+
   }
 
   getRooms() {
@@ -91,6 +95,9 @@ export class RoomListComponent implements OnInit, AfterViewInit {
         this.serverIsOk = false;
       }
     );
+
+    this.store.dispatch(init())
+
   }
 
   bookRoom(room:any) {
@@ -130,14 +137,19 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   bookedRoom(id: number, bookPeriod: BookDates) {
     if (bookPeriod === 'cancelBook') {
       this.rooms.map((item) => { item.id == id ?  delete item.bookDates  : item.bookDates });
+      let room = this.rooms.filter((item) => item.id === id);
+      this.store.dispatch(cancelBookRoom(room[0]))
     } else {
       this.rooms.map((item) => { item.id == id ? item.bookDates = bookPeriod : item.bookDates });
+      let room = this.rooms.filter((item) => item.id === id);
+      this.store.dispatch(bookRoom(room[0]))
     }
 
     this.httpService.bookedRoom(this.rooms).subscribe(
       () => {
         this.getRooms()
       })
+
   }
 }
 

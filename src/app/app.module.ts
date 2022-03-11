@@ -15,6 +15,10 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RoomBookComponent } from './room-book/room-book.component';
+import { StoreModule } from '@ngrx/store';
+import { roomReducer, roomsReducer, metaReducers } from './store/reducers/rooms.reducer';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -33,7 +37,11 @@ import { RoomBookComponent } from './room-book/room-book.component';
      ReactiveFormsModule,
      AppRoutingModule,
      NgbModule,
-    HttpClientModule
+    HttpClientModule,
+    StoreModule.forRoot({'roomPage': roomReducer}, {
+      metaReducers
+    }),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
 
   ],
   providers: [],
