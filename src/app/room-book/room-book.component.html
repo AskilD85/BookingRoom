@@ -27,7 +27,7 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Отмена</button>
-  <button mat-button [disabled] = "!range.valid" [mat-dialog-close]="range.value" cdkFocusInitial>Забронировать</button>
-  <button mat-button [mat-dialog-close]="'cancelBook'"  >Отменить запись</button>
+  <button mat-button [disabled] = "!range.valid" [mat-dialog-close]="range.value" >Забронировать</button>
+  <button *ngIf="room.bookDates != undefined" mat-button [mat-dialog-close]="'cancelBook'"  cdkFocusInitial>Отменить запись</button>
 </div>
 </div>
