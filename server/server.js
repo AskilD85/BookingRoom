@@ -43,6 +43,7 @@ app.post('/api/rooms',   (req, res) => {
 
     if (req.body) {
         var data1 = JSON.parse(req.body.data.toString());
+
     fs.writeFile("./rooms.json", JSON.stringify(data1), (err, result) => {  // WRITE
         if (err) {
           const status = 401
@@ -64,5 +65,31 @@ app.post('/api/rooms',   (req, res) => {
 
 });
 
+app.post('/api/rooms2',   (req, res) => {
+
+
+    if (req.body) {
+        var data1 = JSON.parse(req.body.data.toString());
+   /* fs.writeFile("./rooms.json", JSON.stringify(data1), (err, result) => {  // WRITE
+        if (err) {
+          const status = 401
+          const message = err
+          res.status(status).json({status, message})
+          return
+        }
+    });*/
+    res.status(200).send( { message: data1}  );
+
+    // res.status(200).send( { message: "Good! Your booking time of room  is updated successfully!"}  );
+
+    } else {
+        res.status(500).send({
+            errorMessage: 'Incorrect data'
+        });
+    }
+
+    res.status(200).send({ message: 'Somthing went wrong?'});
+
+});
 
 app.listen(5000, () => console.log('Server started on port 5000'));

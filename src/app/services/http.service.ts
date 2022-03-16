@@ -21,4 +21,12 @@ export class HttpService {
     formData.append('data', dataString.toString());
     return this.http.post(`${this.uri}/rooms`, formData, { headers } );
   }
+
+  bookedRoom2(data:Room[] | any ) {
+    const headers = new HttpHeaders({});
+    const formData: FormData = new FormData();
+    const dataString = JSON.stringify(data.rooms);
+    formData.append('data', dataString.toString());
+    return this.http.post(`${this.uri}/rooms2`, formData, { headers });
+  }
 }
