@@ -18,9 +18,7 @@ export class HttpService {
     const headers = new HttpHeaders({});
     const formData: FormData = new FormData();
     const dataString = JSON.stringify(data);
-
     formData.append('data', dataString.toString());
-    // return this.http.post(this.url + `articles/${id}`, formData, { headers });
     return this.http.post(`${this.uri}/rooms`, formData, { headers } );
   }
 }

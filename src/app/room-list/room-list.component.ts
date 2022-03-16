@@ -6,10 +6,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
+import { map } from 'rxjs';
 import { BookDates } from '../model/BookRoomData';
 import { BookPeriod, Room } from '../model/Room';
 import { RoomBookComponent } from '../room-book/room-book.component';
 import { BookRoom, init, bookRoom, cancelBookRoom } from '../store/actions/rooms.action';
+import { loadRooms } from '../store/selectors/rooms.selectors';
 import { HttpService } from './../services/http.service';
 
 
@@ -27,8 +29,9 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   rooms!: Room[];
   serverIsOk!: boolean;
   displayedColumns: string[] = ['num', 'places', 'price'];
-  dataSource: MatTableDataSource<Room> = new MatTableDataSource(this.rooms);
 
+  rooms$ = this.store.select(loadRooms)
+  dataSource: MatTableDataSource<Room> = new MatTableDataSource(this.rooms);
   range = new FormGroup({
     start: new FormControl(),
     end: new FormControl(),
@@ -76,19 +79,35 @@ export class RoomListComponent implements OnInit, AfterViewInit {
     }
  }
   ngOnInit() {
-    this.getRooms()
+    // this.getRooms()
+    this.store.dispatch(init())
 
+    this.rooms$.subscribe(
+      (data) => {
+        this.serverIsOk = true;
+        this.rooms = data
+        this.range.reset()
+        this.dataSource = new MatTableDataSource(this.rooms);
+        this.dataSource.paginator = this.paginator || null;
+        this.dataSource.sort = this.sort;
+      }
+    )
   }
 
   getRooms() {
-    this.range.reset()
+    console.log('getRooms ');
+    // this.store.dispatch(init())
+
+   /* this.range.reset()
+
     this.httpService.getRooms().subscribe(
       (data:any)=> {
         this.serverIsOk = true;
         this.rooms = data;
+        console.log('норм: ', data);
+
         this.dataSource = new MatTableDataSource(this.rooms);
-        this.dataSource.paginator = this.paginator || null;
-        this.dataSource.sort = this.sort;
+
       }, (err) => {
         console.log(err);
         this.rooms = []
@@ -97,7 +116,7 @@ export class RoomListComponent implements OnInit, AfterViewInit {
     );
 
     this.store.dispatch(init())
-
+*/
   }
 
   bookRoom(room:any) {
@@ -135,21 +154,33 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   }
   //запись брони
   bookedRoom(id: number, bookPeriod: BookDates) {
+
+    var arr = JSON.parse(JSON.stringify(this.rooms))
+
     if (bookPeriod === 'cancelBook') {
-      this.rooms.map((item) => { item.id == id ?  delete item.bookDates  : item.bookDates });
-      let room = this.rooms.filter((item) => item.id === id);
+      arr.map((item:any) => { item.id === id ?  delete item.bookDates  : item.bookDates });
+      let room = arr.filter((item:any) => item.id === id);
       this.store.dispatch(cancelBookRoom(room[0]))
     } else {
-      this.rooms.map((item) => { item.id == id ? item.bookDates = bookPeriod : item.bookDates });
-      let room = this.rooms.filter((item) => item.id === id);
-      this.store.dispatch(bookRoom(room[0]))
+
+      // arr.forEach((item) => { console.log(item);       item.id == id ? item.bookDates = bookPeriod : item.bookDates})
+      arr.map((item:Room) => { item && item.id === id ? item.bookDates = bookPeriod : item.bookDates });
+      let rooms = arr.filter((item:any) => item.id === id);
+      this.store.dispatch(bookRoom(rooms[0]))
     }
 
-    this.httpService.bookedRoom(this.rooms).subscribe(
-      () => {
-        this.getRooms()
+    console.log(arr.length);
+
+    this.httpService.bookedRoom(arr).subscribe(
+      (data) => {
+        console.log( data);
+
+        // this.getRooms()
       })
 
+  }
+  initRooms() {
+    this.store.dispatch(init())
   }
 }
 

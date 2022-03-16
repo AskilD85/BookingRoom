@@ -7,11 +7,13 @@ export namespace ROOM_ACTION {
 
 export class BookRoom implements Action {
   readonly type = ROOM_ACTION.BOOK_ROOM;
-  constructor (public payload:Room) {}
+  constructor (public payload:Room[]) {}
 }
 
 
 
 export const init = createAction('[BOOK_ROOM] init')
-export const bookRoom = createAction('[BOOK_ROOM] bookRoom', props<Room>())
-export const cancelBookRoom = createAction('[BOOK_ROOM] cancelBookRoom', props<Room>())
+export const initSuccess = createAction('[BOOK_ROOM] initSuccess', props<{rooms: Room[]}>())
+
+export const bookRoom = createAction('[BOOK_ROOM] booked Room', props<{rooms: Room[]}>())
+export const cancelBookRoom = createAction('[BOOK_ROOM] cancel BookedRoom', props<Room>())

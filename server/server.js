@@ -52,7 +52,7 @@ app.post('/api/rooms',   (req, res) => {
         }
     });
 
-    res.status(200).send( { message: "Good!"}  );
+    res.status(200).send( { message: "Good! Your booking time of room  is updated successfully!"}  );
 
     } else {
         res.status(500).send({
@@ -60,7 +60,7 @@ app.post('/api/rooms',   (req, res) => {
         });
     }
 
-    res.status(200).send({ message: 'Пизда'});
+    res.status(200).send({ message: 'Somthing went wrong?'});
 
 });
 
