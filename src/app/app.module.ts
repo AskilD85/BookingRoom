@@ -19,6 +19,8 @@ import { StoreModule } from '@ngrx/store';
 import { roomReducer, roomsReducer, metaReducers } from './store/reducers/rooms.reducer';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
+import { EffectsModule } from '@ngrx/effects';
+import { RoomsEffect } from './store/effects/rooms.effects';
 
 @NgModule({
   declarations: [
@@ -38,11 +40,11 @@ import { environment } from '../environments/environment';
      AppRoutingModule,
      NgbModule,
     HttpClientModule,
-    StoreModule.forRoot({'roomPage': roomReducer}, {
+    StoreModule.forRoot({ 'roomPage': roomReducer, },  {
       metaReducers
     }),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-
+    EffectsModule.forRoot([RoomsEffect]),
   ],
   providers: [],
   bootstrap: [AppComponent]
