@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,7 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import { BookDates } from '../model/BookRoomData';
 import { BookPeriod, Room } from '../model/Room';
 import { RoomBookComponent } from '../room-book/room-book.component';
@@ -24,18 +24,19 @@ import { HttpService } from './../services/http.service';
 
 
 
-export class RoomListComponent implements OnInit, AfterViewInit {
+export class RoomListComponent implements OnInit, AfterViewInit, OnDestroy {
   filterDictionary = new Map<string, string>();
   rooms!: Room[];
   serverIsOk!: boolean;
   displayedColumns: string[] = ['num', 'places', 'price'];
-
+  sRooms: Subscription = new Subscription;
   rooms$ = this.store.select(loadRooms)
   dataSource: MatTableDataSource<Room> = new MatTableDataSource(this.rooms);
   range = new FormGroup({
     start: new FormControl(),
     end: new FormControl(),
   });
+
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
   @ViewChild(MatSort) sort!: MatSort ;
@@ -46,6 +47,12 @@ export class RoomListComponent implements OnInit, AfterViewInit {
     // const rooms = Array.from({ length: 40 }, (_, k) => createNewRooms(k + 1));
     // Assign the data to the data source for the table to render
     //
+  }
+  ngOnDestroy(): void {
+    if (this.sRooms) {
+      this.sRooms.unsubscribe()
+    }
+    throw new Error('Method not implemented.');
   }
 
   ngAfterViewInit() {
@@ -82,7 +89,7 @@ export class RoomListComponent implements OnInit, AfterViewInit {
     // this.getRooms()
     this.store.dispatch(init())
 
-    this.rooms$.subscribe(
+   this.sRooms =  this.rooms$.subscribe(
       (data) => {
         this.serverIsOk = true;
         this.rooms = data
@@ -155,71 +162,32 @@ export class RoomListComponent implements OnInit, AfterViewInit {
   //запись брони
   bookedRoom(id: number, bookPeriod: BookDates) {
 
+    //копируем массив для дальнейшей обработки
     var arr = JSON.parse(JSON.stringify(this.rooms))
 
     if (bookPeriod === 'cancelBook') {
       arr.map((item:any) => { item.id === id ?  delete item.bookDates  : item.bookDates });
       let room = arr.filter((item:any) => item.id === id);
+      this.httpService.bookedRoom(arr).subscribe(
+        (data) => {
+          console.log(data);
+          // this.getRooms()
+        })
       this.store.dispatch(cancelBookRoom(room[0]))
     } else {
 
-      // arr.forEach((item) => { console.log(item);       item.id == id ? item.bookDates = bookPeriod : item.bookDates})
       arr.map((item:Room) => { item && item.id === id ? item.bookDates = bookPeriod : item.bookDates });
       let rooms = arr.filter((item:any) => item.id === id);
+      this.httpService.bookedRoom(arr).subscribe(
+        (data) => {
+          console.log(data);
+          // this.getRooms()
+        })
       this.store.dispatch(bookRoom(rooms[0]))
     }
-
-    console.log(arr.length);
-
-    this.httpService.bookedRoom(arr).subscribe(
-      (data) => {
-        console.log( data);
-
-        // this.getRooms()
-      })
-
   }
+
   initRooms() {
     this.store.dispatch(init())
   }
-}
-
-
-
-
-/** использовал до моков из  сервера  */
-function createNewRooms(id: number): Room {
-
-  // количество мест в комнате
-  let places =  getRandomInt(6);
-  // в зависимости кол-ва мест - образуется цена (чисто для примера)
-  let price = 1200 * places;
-  const date1 = new Date()
-  const inWeek = new Date()
-  var D = new Date();
-  D.setDate(D.getDate() - 15);
-  // console.log(D);
-
-  const randDate = randomDate(new Date(), D)
-  let EndDate = new Date(randDate)
-  EndDate.setDate(randDate.getDate() + 6);
-  // console.log(3433, randomDate(new Date(), D));
-
-
-  return {
-    roomNum: id,
-    id: id,
-    places: places,
-    price: price,
-    bookPeriod: { start: randDate, end: EndDate }
-  };
-}
-
-function getRandomInt(max: any) {
-  return Math.floor(Math.random() * max) + 1;
-}
-
-function randomDate(start: Date, end:Date) {
-  return new Date(start.getTime()
-    + Math.random() * (end.getTime() - start.getTime()));
 }
