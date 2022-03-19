@@ -1,9 +1,8 @@
 import { ActionReducerMap, createReducer, MetaReducer, on, State } from "@ngrx/store";
-import { environment } from "src/environments/environment";
-import { BookDates } from "../../model/BookRoomData";
-import { BookPeriod, Room } from "../../model/Room";
-import { bookRoom, BookRoom, bookRoomSuccess, cancelBookRoom, init, initSuccess, ROOM_ACTION } from "../actions/rooms.action";
+import {  Room } from "../../model/Room";
+import {  BookRoom, bookRoomSuccess, cancelBookRoom, init, initSuccess, ROOM_ACTION } from "../actions/rooms.action";
 import { AppState } from "../state/app.state";
+import { environment } from './../../../environments/environment.prod';
 
 export interface RoomState {
   rooms: Room[],

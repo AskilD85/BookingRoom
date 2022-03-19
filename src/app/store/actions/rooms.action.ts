@@ -1,5 +1,5 @@
 import { Action, createAction, props } from "@ngrx/store";
-import { Room } from 'src/app/model/Room';
+import { Room } from './../../model/Room';
 
 export namespace ROOM_ACTION {
   export const BOOK_ROOM = 'BOOK ROOM'

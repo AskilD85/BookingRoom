@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { filter, map, mergeMap, tap, concatMap } from "rxjs";
-import { Room } from "src/app/model/Room";
-import { HttpService } from "src/app/services/http.service";
 import { bookRoom, bookRoomSuccess, cancelBookRoom, init, initSuccess } from "../actions/rooms.action";
+import { HttpService } from './../../services/http.service';
 
 @Injectable()
 export class RoomsEffect  {

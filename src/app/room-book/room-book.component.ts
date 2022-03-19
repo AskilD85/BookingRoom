@@ -1,7 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { BookRoomData } from '../model/BookRoomData';
 import { Room } from './../model/Room';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
